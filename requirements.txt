@@ -1,0 +1,6 @@
+pandas
+streamlit
+plotly
+google-cloud-bigquery
+google-api-core
+google-api-python-client

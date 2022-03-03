@@ -67,6 +67,7 @@ combined = combined.sort_values(by="Week Date").reset_index(drop=True)
 
 # Body
 st.markdown("# Exercise Competition! :woman-running: :woman-biking: :woman-lifting-weights: :woman_climbing: :woman_in_lotus_position: :muscle:")
+st.markdown("Here's how it works. You need at least 100 minutes each week to be considered for a win.  Winner is the person with the most minutes over 100.  Ties are possible!  If no one gets over 100 minutes, there are two losers.")
 st.header("")
 this_week = combined["Week Date"].max()
 last_week = this_week - timedelta(days=7)

@@ -85,17 +85,17 @@ avg_min_t = round(combined["Tara"].mean(), 1)
 
 col1, col2, col3, col4 = st.columns([1, 1, 1, 2])
 col1.metric("Minutes This Week (Lauren)", min_tw_l, min_tw_l - min_lw_l)
-col1.subheader("")
-col1.subheader("")
+col1.add_whitespace(2)
 col1.metric("Minutes This Week (Tara)", min_tw_t, min_tw_t - min_lw_t)
+
 col2.metric("Average Minutes (Lauren)", avg_min_l)
-col2.header("")
-col2.header("")
+col2.add_whitespace(2)
 col2.metric("Average Minutes (Tara)", avg_min_t)
+
 col3.metric("Total Minutes (Lauren)", int(lauren['Minutes'].sum()))
-col3.header("")
-col3.header("")
+col3.add_whitespace(2)
 col3.metric("Total Minutes (Tara)", int(tara['Minutes'].sum()))
+
 fig = px.pie(combined["Winner"].value_counts().reset_index(),
              values="Winner",
              names="index",

@@ -3,7 +3,7 @@ import streamlit as st
 from datetime import timedelta
 import plotly.graph_objects as go
 import plotly.express as px
-from funcs import get_data, write_to_sheet, check_input, add_whitespace
+from funcs import get_data, write_to_sheet, check_input, add_whitespace, write_new_rows
 
 # Settings
 st.set_page_config(page_title="Fitness Tracker!", page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
@@ -18,11 +18,12 @@ log_name = form.multiselect("Name", ["Lauren", "Tara"], default=["Lauren", "Tara
 log_date = form.date_input("Date")
 log_activity = form.selectbox("Activity", ["Bike", "Climb", "Eliptical", "Hike", "Stretching", "Yoga", "Walk", "Weights", "Other"])
 log_minutes = form.number_input("Minutes", 0, 100, 30, 5)
+log_distance = form.number_input("Distance (in miles)", step=0.01)
 log_notes = form.text_area("Workout Notes", value="")
 
-new_data = get_data(spreadsheet_id, "new_data!A:G")
+new_data = get_data(spreadsheet_id, "new_data!A:H")
 new_data = pd.DataFrame(new_data[1:], columns=new_data[0])
-cols = ["Day", "Week", "Week Date", "Name", "Activity", "Minutes", "Notes"]
+cols = ["Day", "Week", "Week Date", "Name", "Activity", "Minutes", "Distance", "Notes"]
 
 submit_log = form.form_submit_button("Log Minutes", on_click=check_input(log_name, log_minutes))
 if submit_log:
@@ -32,21 +33,14 @@ if submit_log:
         for name in ["Tara", "Lauren"]:
             recorded_weeks = new_data[new_data["Name"] == name]["Week Date"].unique()
             if str(week_date) not in recorded_weeks:
-                dummy_vals = [log_date.strftime("%Y-%m-%d"), str(week), week_date.strftime("%Y-%m-%d"), name, "", str(0), "placeholder for aggregation"]
-                dummy_rows = pd.DataFrame([dummy_vals], columns=cols)
-                new_data = pd.concat([new_data, dummy_rows])
-                new_data = new_data.drop_duplicates()
-                request = write_to_sheet(new_data, spreadsheet_id, "new_data!A:G")
-                response = request.execute()
-            else:
-                pass
+                dummy_vals = [log_date.strftime("%Y-%m-%d"), str(week), week_date.strftime("%Y-%m-%d"), name, "", str(0), str(0), "placeholder for aggregation"]
+                write_new_rows(dummy_vals, cols, new_data, spreadsheet_id, "new_data!A:H")
         for name in log_name:
-            form_vals = [log_date.strftime("%Y-%m-%d"), str(week), week_date.strftime("%Y-%m-%d"), name, log_activity.lower(), str(log_minutes), log_notes]
+            form_vals = [log_date.strftime("%Y-%m-%d"), str(week), week_date.strftime("%Y-%m-%d"), name, log_activity.lower(), str(log_minutes), log_distance, log_notes]
             form_rows = pd.DataFrame([form_vals], columns=cols)
             new_data = pd.concat([new_data, form_rows])
             new_data = new_data.drop_duplicates()
-            request = write_to_sheet(new_data, spreadsheet_id, "new_data!A:G")
-            response = request.execute()
+            write_new_rows(form_vals, cols, new_data, spreadsheet_id, "new_data!A:H")
 
 # # Uncomment below to read from tracker data and write to data sheet
 # from funcs import get_and_melt_raw_data
@@ -57,7 +51,7 @@ if submit_log:
 # Data
 rows = get_data(spreadsheet_id, range_name)
 df = pd.DataFrame(rows[1:], columns=rows[0])
-row_updates = get_data(spreadsheet_id, "new_data!A:G")
+row_updates = get_data(spreadsheet_id, "new_data!A:H")
 if len(row_updates) > 0:
     new_rows = pd.DataFrame(row_updates[1:], columns=row_updates[0])
     df = pd.concat([df, new_rows])

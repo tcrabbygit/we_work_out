@@ -16,12 +16,13 @@ st.sidebar.markdown("### Log :muscle: Minutes")
 form = st.sidebar.form("log_time")
 log_name = form.multiselect("Name", ["Lauren", "Tara"], default=["Lauren", "Tara"])
 log_date = form.date_input("Date")
-log_activity = form.selectbox("Activity", ["Walk", "Bike", "Yoga", "Eliptical", "Weights", "Other"])
+log_activity = form.selectbox("Activity", ["Bike", "Climb", "Eliptical", "Stretching", "Yoga", "Walk", "Weights", "Other"])
 log_minutes = form.number_input("Minutes", 0, 100, 30, 5)
-log_notes = form.text_area("Workout Notes")
+log_notes = form.text_area("Workout Notes", value="")
 
 new_data = get_data(spreadsheet_id, "new_data!A:G")
 new_data = pd.DataFrame(new_data[1:], columns=new_data[0])
+new_data
 cols = ["Day", "Week", "Week Date", "Name", "Activity", "Minutes", "Notes"]
 
 submit_log = form.form_submit_button("Log Minutes", on_click=check_input(log_name, log_minutes))
@@ -30,7 +31,7 @@ if submit_log:
     week = log_date.isocalendar()[1]
     if len(log_name) > 0 and log_minutes > 0:
         for name in log_name:
-            form_vals = [log_date.strftime("%Y-%m-%d"), str(week), week_date.strftime("%Y-%m-%d"), name, log_activity.lower(), str(log_minutes)]
+            form_vals = [log_date.strftime("%Y-%m-%d"), str(week), week_date.strftime("%Y-%m-%d"), name, log_activity.lower(), str(log_minutes), log_notes]
             form_rows = pd.DataFrame([form_vals], columns=cols)
             new_data = pd.concat([new_data, form_rows])
             new_data = new_data.drop_duplicates()
@@ -46,7 +47,7 @@ if submit_log:
 # Data
 rows = get_data(spreadsheet_id, range_name)
 df = pd.DataFrame(rows[1:], columns=rows[0])
-row_updates = get_data(spreadsheet_id, "new_data!A:H")
+row_updates = get_data(spreadsheet_id, "new_data!A:G")
 if len(row_updates) > 0:
     new_rows = pd.DataFrame(row_updates[1:], columns=row_updates[0])
     df = pd.concat([df, new_rows])

@@ -3,7 +3,7 @@ import streamlit as st
 from datetime import timedelta
 import plotly.graph_objects as go
 import plotly.express as px
-from funcs import get_data, write_to_sheet, check_input
+from funcs import get_data, write_to_sheet, check_input, add_whitespace
 
 # Settings
 st.set_page_config(page_title="Fitness Tracker!", page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
@@ -68,12 +68,12 @@ combined = combined.sort_values(by="Week Date").reset_index(drop=True)
 # Body
 st.markdown("# Exercise Competition! :woman-running: :woman-biking: :woman-lifting-weights: :woman_climbing: :woman_in_lotus_position: :muscle:")
 st.markdown("Here's how it works. You need at least 100 minutes each week to be considered for a win.  Winner is the person with the most minutes over 100.  Ties are possible!  If no one gets over 100 minutes, there are two losers.")
-st.header("")
+add_whitespace(2)
 this_week = combined["Week Date"].max()
 last_week = this_week - timedelta(days=7)
 winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].values[0]
 st.markdown(f"##### :trophy: Last Week's Winner: {winner_last_week} :trophy:")
-st.header("")
+add_whitespace(2)
 
 st.markdown("## Stats")
 min_tw_l = int(lauren[lauren["Week Date"] == this_week]["Minutes"].sum())

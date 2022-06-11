@@ -65,3 +65,8 @@ def check_input(log_name, log_minutes):
         st.sidebar.error("Name field is required")
     elif log_minutes < 1:
         st.sidebar.error("Minutes must be more than 0")
+        
+   
+def add_whitespace(line_count):
+    for i in range(0, line_count):
+        st.write("")

@@ -14,9 +14,10 @@ range_name = "data!A:F"
 
 st.sidebar.markdown("### Log :muscle: Minutes")
 form = st.sidebar.form("log_time")
-log_name = form.multiselect("Name", ["Lauren", "Tara"])
+log_name = form.multiselect("Name", ["Lauren", "Tara"], default=["Lauren", "Tara"])
 log_date = form.date_input("Date")
-log_activity = form.text_input("Activity")
+# log_activity = form.text_input("Activity")
+log_activity = form.selectbox("Activity", ["Walk", "Bike", "Yoga", "Eliptical", "Weights", "Other"])
 log_minutes = form.number_input("Minutes", 0, 100, 30, 5)
 
 new_data = get_data(spreadsheet_id, "new_data!A:F")

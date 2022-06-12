@@ -91,6 +91,39 @@ col1.markdown(f"##### :trophy: Last Week's Winner (Minutes): {winner_min_last_we
 col2.markdown(f"##### :trophy: Last Week's Winner (Workouts): {winner_wo_last_week} :trophy:")
 add_whitespace(2)
 
+"### Weekly Winners"
+col1, col2 = st.columns(2)
+fig = px.pie(combined["Winner (Minutes)"].value_counts().reset_index(),
+             values="Winner (Minutes)",
+             names="index",
+             color="index",
+             color_discrete_map={"None": "#EDF2F4",
+                                 "Tie": "#8D99AE",
+                                 "Lauren": "#D80032",
+                                 "Tara": "#2B2D42"})
+fig.update_layout(height=300,
+                  width=400,
+                  margin=dict(l=0, r=80, t=0, b=80, pad=0)
+                  )
+col1.write("Minutes")
+col1.plotly_chart(fig, use_container_widte=True)
+
+fig = px.pie(combined["Winner (Workouts)"].value_counts().reset_index(),
+             values="Winner (Workouts)",
+             names="index",
+             color="index",
+             color_discrete_map={"None": "#EDF2F4",
+                                 "Tie": "#8D99AE",
+                                 "Lauren": "#D80032",
+                                 "Tara": "#2B2D42"})
+fig.update_layout(height=300,
+                  width=400,
+                  margin=dict(l=0, r=80, t=0, b=80, pad=0)
+                  )
+col2.write("Workouts")
+col2.plotly_chart(fig, use_container_widte=True)
+add_whitespace(2)
+
 "## Stats"
 "### Lauren"
 min_tw_l = int(lauren[lauren["Week Date"] == this_week]["Minutes"].sum())
@@ -153,36 +186,12 @@ fig.update_yaxes(showline=True, linewidth=2, linecolor='#8D99AE', showgrid=True,
 st.plotly_chart(fig, use_container_width=True)
 add_whitespace(3)
 
-"### Weekly Winners"
-col1, col2 = st.columns(2)
-fig = px.pie(combined["Winner (Minutes)"].value_counts().reset_index(),
-             values="Winner (Minutes)",
-             names="index",
-             color="index",
-             color_discrete_map={"None": "#EDF2F4",
-                                 "Tie": "#8D99AE",
-                                 "Lauren": "#D80032",
-                                 "Tara": "#2B2D42"})
-fig.update_layout(height=300,
-                  width=400,
-                  margin=dict(l=0, r=80, t=0, b=80, pad=0)
-                  )
-col1.write("Minutes")
-col1.plotly_chart(fig, use_container_widte=True)
+"### Log"
+st.dataframe(combined)
+add_whitespace(2)
 
-fig = px.pie(combined["Winner (Workouts)"].value_counts().reset_index(),
-             values="Winner (Workouts)",
-             names="index",
-             color="index",
-             color_discrete_map={"None": "#EDF2F4",
-                                 "Tie": "#8D99AE",
-                                 "Lauren": "#D80032",
-                                 "Tara": "#2B2D42"})
-fig.update_layout(height=300,
-                  width=400,
-                  margin=dict(l=0, r=80, t=0, b=80, pad=0)
-                  )
-col2.write("Workouts")
-col2.plotly_chart(fig, use_container_widte=True)
+"### Raw"
+st.dataframe(df)
+add_whitespace(2)
 
 st.markdown("Tracker sheet located [here](https://docs.google.com/spreadsheets/d/1BAWUiSI8jV0hSmaD9b_68CaRgSca9J_Odb1TpWRYuZU/edit?usp=sharing)")

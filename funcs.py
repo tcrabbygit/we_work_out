@@ -65,8 +65,17 @@ def check_input(log_name, log_minutes):
         st.sidebar.error("Name field is required")
     elif log_minutes < 1:
         st.sidebar.error("Minutes must be more than 0")
-        
-   
+
+
+def write_new_rows(values, cols, df, spreadsheet_id, range):
+    rows = pd.DataFrame([values], columns=cols)
+    new_data = pd.concat([df, rows])
+    new_data = new_data.drop_duplicates()
+    request = write_to_sheet(new_data, spreadsheet_id, range)
+    response = request.execute()
+    return response
+
+
 def add_whitespace(line_count):
     for i in range(0, line_count):
         st.write("")

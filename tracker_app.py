@@ -89,7 +89,7 @@ winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].va
 col1, col2 = st.columns(2)
 col1.markdown(f"##### :trophy: Last Week's Winner (Minutes): {winner_last_week} :trophy:")
 
-col2.markdown("#### :trophy: Weekly Winners :trophy:")
+col2.markdown("##### :trophy: Weekly Winners :trophy:")
 fig = px.pie(combined["Winner"].value_counts().reset_index(),
              values="Winner",
              names="index",

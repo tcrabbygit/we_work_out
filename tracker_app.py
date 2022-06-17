@@ -86,7 +86,7 @@ this_week = now - timedelta(days=now.weekday())
 last_week = this_week - timedelta(days=7)
 winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].values[0]
 
-col1, col2 = st.markdown(2)
+col1, col2 = st.columns(2)
 col1.markdown(f"##### :trophy: Last Week's Winner (Minutes): {winner_last_week} :trophy:")
 
 "### Weekly Winners"

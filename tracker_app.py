@@ -193,7 +193,7 @@ add_whitespace(2)
 
 "### Raw"
 # df.style.format({"Week Date": lambda t: t.strftime("%y-%m-%d"), "Day": lambda t: t.strftime("%y-%m-%d")})
-st.dataframe(df, width=1000)
+st.dataframe(df.style.format({"Week Date": lambda t: t.strftime("%y-%m-%d"), "Day": lambda t: t.strftime("%y-%m-%d")}), width=1000)
 add_whitespace(2)
 
 st.markdown("Tracker sheet located [here](https://docs.google.com/spreadsheets/d/1BAWUiSI8jV0hSmaD9b_68CaRgSca9J_Odb1TpWRYuZU/edit?usp=sharing)")

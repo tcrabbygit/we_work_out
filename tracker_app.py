@@ -85,7 +85,7 @@ st.markdown("Here's how it works. You need at least 90 minutes and 3 workouts ea
 add_whitespace(2)
 this_week = combined["Week Date"].max()
 this_week
-now = datetime.date.today()
+now = date.today()
 this_week = now - timedelta(days=now.weekday())
 this_week
 last_week = this_week - timedelta(days=7)

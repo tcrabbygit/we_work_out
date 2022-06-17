@@ -187,10 +187,12 @@ st.plotly_chart(fig, use_container_width=True)
 add_whitespace(3)
 
 "### Log"
+combined.style.format({"Week Date": lambda t: t.strftime("%y-%m-%d")})
 st.dataframe(combined, width=800)
 add_whitespace(2)
 
 "### Raw"
+df.style.format({"Week Date": lambda t: t.strftime("%y-%m-%d"), "Day": lambda t: t.strftime("%y-%m-%d")})
 st.dataframe(df, width=800)
 add_whitespace(2)
 

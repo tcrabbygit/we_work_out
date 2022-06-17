@@ -85,25 +85,25 @@ now = datetime.combine(date.today(), datetime.min.time())
 this_week = now - timedelta(days=now.weekday())
 last_week = this_week - timedelta(days=7)
 winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].values[0]
-f"##### :trophy: Last Week's Winner (Minutes): {winner_last_week} :trophy:"
-add_whitespace(2)
 
-# "### Weekly Winners"
-# col1, col2 = st.columns(2)
-# fig = px.pie(combined["Winner (Minutes)"].value_counts().reset_index(),
-#              values="Winner (Minutes)",
-#              names="index",
-#              color="index",
-#              color_discrete_map={"None": "#EDF2F4",
-#                                  "Tie": "#8D99AE",
-#                                  "Lauren": "#D80032",
-#                                  "Tara": "#2B2D42"})
-# fig.update_layout(height=300,
-#                   width=400,
-#                   margin=dict(l=0, r=80, t=0, b=80, pad=0)
-#                   )
-# col1.write("Minutes")
-# col1.plotly_chart(fig, use_container_widte=True)
+col1, col2 = st.markdown(2)
+col1.markdown(f"##### :trophy: Last Week's Winner (Minutes): {winner_last_week} :trophy:")
+
+"### Weekly Winners"
+fig = px.pie(combined["Winner"].value_counts().reset_index(),
+             values="Winner",
+             names="index",
+             color="index",
+             color_discrete_map={"None": "#EDF2F4",
+                                 "Tie": "#8D99AE",
+                                 "Lauren": "#D80032",
+                                 "Tara": "#2B2D42"})
+fig.update_layout(height=300,
+                  width=400,
+                  margin=dict(l=0, r=80, t=0, b=80, pad=0)
+                  )
+col2.write("Minutes")
+col2.plotly_chart(fig, use_container_widte=True)
 
 # fig = px.pie(combined["Winner (Workouts)"].value_counts().reset_index(),
 #              values="Winner (Workouts)",

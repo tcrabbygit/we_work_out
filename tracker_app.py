@@ -188,7 +188,7 @@ add_whitespace(3)
 
 "### Log"
 # combined.style.format({"Week Date": lambda t: t.strftime("%y-%m-%d")})
-st.dataframe(combined, width=1000)
+st.dataframe(combined.style.format({"Week Date": lambda t: t.strftime("%y-%m-%d")}), width=1000)
 add_whitespace(2)
 
 "### Raw"

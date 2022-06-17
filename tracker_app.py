@@ -187,11 +187,11 @@ st.plotly_chart(fig, use_container_width=True)
 add_whitespace(3)
 
 "### Log"
-st.dataframe(combined)
+st.dataframe(combined, width=500)
 add_whitespace(2)
 
 "### Raw"
-st.dataframe(df)
+st.dataframe(df, width=500)
 add_whitespace(2)
 
 st.markdown("Tracker sheet located [here](https://docs.google.com/spreadsheets/d/1BAWUiSI8jV0hSmaD9b_68CaRgSca9J_Odb1TpWRYuZU/edit?usp=sharing)")

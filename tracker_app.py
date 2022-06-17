@@ -75,19 +75,14 @@ tara = tara.merge(tara_wo, on=["Week", "Week Date"])
 
 combined = lauren.merge(tara, on=["Week", "Week Date"], suffixes=["_l", "_t"]).rename(columns={"Minutes_l": "Minutes (Lauren)", "Minutes_t": "Minutes (Tara)", "Workouts_l": "Workouts (Lauren)", "Workouts_t": "Workouts (Tara)", "Distance_l": "Distance (Lauren)", "Distance_t": "Distance (Tara)"})
 combined["Winner"] = combined.apply(lambda row: "None" if row["Minutes (Lauren)"] < 100 and row["Minutes (Tara)"] < 100 and row["Workouts (Lauren)"] < 3 and row["Workouts (Tara)"] < 3 else ("Lauren" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) > (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else ("Tara" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) < (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else "Tie")), axis=1)
-# combined["Winner (Minutes)"] = combined.apply(lambda row: "None" if row["Minutes (Lauren)"] < 100 and row["Minutes (Tara)"] < 100 and row["Workouts (Lauren)"] < 3 and row["Workouts (Tara)"] < 3 else ("Lauren" if row["Minutes (Lauren)"] > row["Minutes (Tara)"] else ("Tara" if row["Minutes (Lauren)"] < row["Minutes (Tara)"] else "Tie")), axis=1)
-# combined["Winner (Workouts)"] = combined.apply(lambda row: "None" if row["Minutes (Lauren)"] < 100 and row["Minutes (Tara)"] < 100 and row["Workouts (Lauren)"] < 3 and row["Workouts (Tara)"] < 3 else ("Lauren" if row["Workouts (Lauren)"] > row["Workouts (Tara)"] else ("Tara" if row["Workouts (Lauren)"] < row["Workouts (Tara)"] else "Tie")), axis=1)
 combined = combined.sort_values(by="Week Date").reset_index(drop=True)
 
 # Body
 st.markdown("# Exercise Competition! :woman-running: :woman-biking: :woman-lifting-weights: :woman_climbing: :woman_in_lotus_position: :muscle:")
 st.markdown("Here's how it works. You need at least 90 minutes and 3 workouts each week to be considered for a win.  Points are calculated as `Minutes` * `Workouts`.  The winner is the person with the highest points.  Ties are possible!  If no one gets over the required thresholds, there are two losers.")
 add_whitespace(2)
-this_week = combined["Week Date"].max()
-this_week
-now = date.today()
+now = datetime.combine(date.today(), datetime.min.time())
 this_week = now - timedelta(days=now.weekday())
-this_week
 last_week = this_week - timedelta(days=7)
 winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].values[0]
 f"##### :trophy: Last Week's Winner (Minutes): {winner_last_week} :trophy:"

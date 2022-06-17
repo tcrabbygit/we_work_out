@@ -86,12 +86,12 @@ last_week = this_week - timedelta(days=7)
 this_week
 last_week
 
-now = datetime.combine(date.today(), datetime.min.time())
-this_week = now - timedelta(days=now.weekday())
-last_week = this_week - timedelta(days=7)
-now
-this_week
-last_week
+# now = datetime.combine(date.today(), datetime.min.time())
+# this_week = now - timedelta(days=now.weekday())
+# last_week = this_week - timedelta(days=7)
+# now
+# this_week
+# last_week
 
 
 

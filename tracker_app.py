@@ -89,7 +89,7 @@ winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].va
 col1, col2 = st.columns(2)
 col1.markdown(f"##### :trophy: Last Week's Winner (Minutes): {winner_last_week} :trophy:")
 
-"### Weekly Winners"
+col2.markdown("#### Weekly Winners")
 fig = px.pie(combined["Winner"].value_counts().reset_index(),
              values="Winner",
              names="index",
@@ -102,24 +102,7 @@ fig.update_layout(height=300,
                   width=400,
                   margin=dict(l=0, r=80, t=0, b=80, pad=0)
                   )
-col2.write("Minutes")
 col2.plotly_chart(fig, use_container_widte=True)
-
-# fig = px.pie(combined["Winner (Workouts)"].value_counts().reset_index(),
-#              values="Winner (Workouts)",
-#              names="index",
-#              color="index",
-#              color_discrete_map={"None": "#EDF2F4",
-#                                  "Tie": "#8D99AE",
-#                                  "Lauren": "#D80032",
-#                                  "Tara": "#2B2D42"})
-# fig.update_layout(height=300,
-#                   width=400,
-#                   margin=dict(l=0, r=80, t=0, b=80, pad=0)
-#                   )
-# col2.write("Workouts")
-# col2.plotly_chart(fig, use_container_widte=True)
-# add_whitespace(2)
 
 "## Stats"
 "### Lauren"

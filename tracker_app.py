@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 import plotly.graph_objects as go
 import plotly.express as px
 from funcs import get_data, write_to_sheet, check_input, add_whitespace, write_new_rows

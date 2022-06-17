@@ -83,11 +83,18 @@ st.markdown("Here's how it works. You need at least 90 minutes and 3 workouts ea
 add_whitespace(2)
 this_week = combined["Week Date"].max()
 last_week = this_week - timedelta(days=7)
+this_week
 last_week
+
 now = datetime.combine(date.today(), datetime.min.time())
 this_week = now - timedelta(days=now.weekday())
 last_week = this_week - timedelta(days=7)
+now
+this_week
 last_week
+
+
+
 winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].values[0]
 f"##### :trophy: Last Week's Winner (Minutes): {winner_last_week} :trophy:"
 add_whitespace(2)

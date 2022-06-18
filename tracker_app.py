@@ -112,6 +112,7 @@ wo_tw_l = int(combined[combined["Week Date"] == this_week]["Workouts (Lauren)"])
 wo_lw_l = int(combined[combined["Week Date"] == last_week]["Workouts (Lauren)"])
 avg_min_l = round(combined["Minutes (Lauren)"].mean(), 1)
 avg_wo_l = round(combined["Workouts (Lauren)"].mean(), 1)
+med_wo_l = combined["Workouts (Lauren)"].median()
 
 wo_tw_t = int(combined[combined["Week Date"] == this_week]["Workouts (Tara)"])
 wo_lw_t = int(combined[combined["Week Date"] == last_week]["Workouts (Tara)"])
@@ -119,12 +120,14 @@ min_tw_t = int(tara[tara["Week Date"] == this_week]["Minutes"].sum())
 min_lw_t = int(tara[tara["Week Date"] == last_week]["Minutes"].sum())
 avg_min_t = round(combined["Minutes (Tara)"].mean(), 1)
 avg_wo_t = round(combined["Workouts (Tara)"].mean(), 1)
+med_wo_t = combined["Workouts (Tara)"].median()
 
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Minutes This Week", min_tw_l, min_tw_l - min_lw_l)
 col2.metric("Average Minutes per Week", avg_min_l)
 col3.metric("Workouts This Week", wo_tw_l, wo_tw_l - wo_lw_l)
-col4.metric("Average Workouts per Week", avg_wo_l)
+# col4.metric("Average Workouts per Week", avg_wo_l)
+col4.metric("Median Workouts per Week", med_wo_l)
 add_whitespace(2)
 
 "### Tara"
@@ -132,7 +135,8 @@ col1, col2, col3, col4 = st.columns(4)
 col1.metric("Minutes This Week (Tara)", min_tw_t, min_tw_t - min_lw_t)
 col2.metric("Average Minutes per Week", avg_min_t)
 col3.metric("Workouts This Week", wo_tw_t, wo_tw_t - wo_lw_t)
-col4.metric("Average Workouts per Week", avg_wo_t)
+# col4.metric("Average Workouts per Week", avg_wo_t)
+col4.metric("Median Workouts per Week", med_wo_t)
 add_whitespace(3)
 
 "## Data"

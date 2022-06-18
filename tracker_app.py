@@ -168,7 +168,7 @@ mi = combined[combined["Week Date"] >= "2022-05-30"]
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=mi["Week Date"], y=mi["Distance (Lauren)"], mode="lines+markers", name="Lauren", line=dict(color="#d90429")))
 fig.add_trace(go.Scatter(x=mi["Week Date"], y=mi["Distance (Tara)"], mode="lines+markers", name="Tara", line=dict(color="#2b2d42")))
-fig.update_layout(plot_bgcolor="#FCFDFD", xaxis_title="Week", yaxis_title="Minutes", margin=dict(l=0, r=0, t=0, b=0, pad=0), height=400, legend_yanchor="middle", legend_y=0.5)
+fig.update_layout(plot_bgcolor="#FCFDFD", xaxis_title="Week", yaxis_title="Miles", margin=dict(l=0, r=0, t=0, b=0, pad=0), height=400, legend_yanchor="middle", legend_y=0.5)
 fig.update_xaxes(showline=True, linewidth=2, linecolor='#8D99AE')
 fig.update_yaxes(showline=True, linewidth=2, linecolor='#8D99AE', showgrid=True, gridwidth=1, gridcolor="#D7DBE2")
 st.plotly_chart(fig, use_container_width=True)

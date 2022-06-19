@@ -25,7 +25,7 @@ new_data = get_data(spreadsheet_id, "new_data!A:H")
 new_data = pd.DataFrame(new_data[1:], columns=new_data[0])
 cols = ["Day", "Week", "Week Date", "Name", "Activity", "Minutes", "Distance", "Notes"]
 
-submit_log = form.form_submit_button("Log :muscle:", on_click=check_input(log_name, log_minutes))
+submit_log = form.form_submit_button("Log Workout", on_click=check_input(log_name, log_minutes))
 if submit_log:
     week_date = log_date - timedelta(days=log_date.weekday() % 7)
     week = log_date.isocalendar()[1]

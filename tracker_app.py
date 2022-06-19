@@ -12,7 +12,7 @@ st.set_page_config(page_title="Fitness Tracker!", page_icon=None, layout="wide",
 spreadsheet_id = "1BAWUiSI8jV0hSmaD9b_68CaRgSca9J_Odb1TpWRYuZU"
 range_name = "data!A:G"
 
-st.sidebar.markdown("### Log :muscle: Minutes")
+st.sidebar.markdown("### Log Workout :muscle:")
 form = st.sidebar.form("log_time")
 log_name = form.multiselect("Name", ["Lauren", "Tara"], default=["Lauren", "Tara"])
 log_date = form.date_input("Date")
@@ -25,7 +25,7 @@ new_data = get_data(spreadsheet_id, "new_data!A:H")
 new_data = pd.DataFrame(new_data[1:], columns=new_data[0])
 cols = ["Day", "Week", "Week Date", "Name", "Activity", "Minutes", "Distance", "Notes"]
 
-submit_log = form.form_submit_button("Log Minutes", on_click=check_input(log_name, log_minutes))
+submit_log = form.form_submit_button("Log :muscle:", on_click=check_input(log_name, log_minutes))
 if submit_log:
     week_date = log_date - timedelta(days=log_date.weekday() % 7)
     week = log_date.isocalendar()[1]

@@ -77,35 +77,7 @@ combined = lauren.merge(tara, on=["Week", "Week Date"], suffixes=["_l", "_t"]).r
 combined["Winner"] = combined.apply(lambda row: "None" if row["Minutes (Lauren)"] < 100 and row["Minutes (Tara)"] < 100 and row["Workouts (Lauren)"] < 3 and row["Workouts (Tara)"] < 3 else ("Lauren" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) > (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else ("Tara" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) < (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else "Tie")), axis=1)
 combined = combined.sort_values(by="Week Date").reset_index(drop=True)
 
-# Body
-"# Exercise Competition! :woman-running: :woman-biking: :woman-lifting-weights: :woman_climbing: :woman_in_lotus_position: :muscle:"
-"Here's how it works. You need at least 90 minutes and 3 workouts each week (Monday - Sunday) to be considered for a win.  Points are calculated as `Minutes` * `Workouts`.  The winner is the person with the highest points.  Ties are possible!  If no one gets over the required thresholds, there are two losers."
-add_whitespace(2)
-now = datetime.combine(date.today(), datetime.min.time())
-this_week = now - timedelta(days=now.weekday())
-last_week = this_week - timedelta(days=7)
-winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].values[0]
-
-col1, col2 = st.columns(2)
-col1.markdown(f"##### :trophy: Last Week's Winner (Minutes): {winner_last_week} :trophy:")
-
-col2.markdown("##### :trophy: Weekly Winners :trophy:")
-fig = px.pie(combined["Winner"].value_counts().reset_index(),
-             values="Winner",
-             names="index",
-             color="index",
-             color_discrete_map={"None": "#EDF2F4",
-                                 "Tie": "#8D99AE",
-                                 "Lauren": "#D80032",
-                                 "Tara": "#2B2D42"})
-fig.update_layout(height=300,
-                  width=400,
-                  margin=dict(l=0, r=80, t=0, b=80, pad=0)
-                  )
-col2.plotly_chart(fig, use_container_widte=True)
-
-"## Stats"
-"### Lauren"
+# Weekly metrics
 try:
     min_tw_l = int(lauren[lauren["Week Date"] == this_week]["Minutes"].sum())
 except TypeError:
@@ -136,7 +108,40 @@ med_min_t = combined["Minutes (Tara)"].median()
 avg_wo_t = round(combined["Workouts (Tara)"].mean(), 1)
 med_wo_t = combined["Workouts (Tara)"].median()
 
+# Body
+"# Exercise Competition! :woman-running: :woman-biking: :woman-lifting-weights: :woman_climbing: :woman_in_lotus_position: :muscle:"
+"Here's how it works. You need at least 90 minutes and 3 workouts each week (Monday - Sunday) to be considered for a win.  Points are calculated as `Minutes` * `Workouts`.  The winner is the person with the highest points.  Ties are possible!  If no one gets over the required thresholds, there are two losers."
+add_whitespace(2)
+now = datetime.combine(date.today(), datetime.min.time())
+this_week = now - timedelta(days=now.weekday())
+last_week = this_week - timedelta(days=7)
+winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].values[0]
+
+col1, col2 = st.columns(2)
+col1.markdown(f"#### :trophy: Last Week's Winner (Minutes): {winner_last_week} :trophy:")
+col1.markdown("##### Points")
+col1.markdown(f"Lauren: {wo_lw_l} workouts * {min_lw_l} minutes = {wo_lw_l * min_lw_l} points")
+col1.markdown(f"Tara: {wo_lw_t} workouts * {min_lw_t} minutes = {wo_lw_t * min_lw_t} points")
+
+col2.markdown("##### :trophy: Weekly Winners :trophy:")
+fig = px.pie(combined["Winner"].value_counts().reset_index(),
+             values="Winner",
+             names="index",
+             color="index",
+             color_discrete_map={"None": "#EDF2F4",
+                                 "Tie": "#8D99AE",
+                                 "Lauren": "#D80032",
+                                 "Tara": "#2B2D42"})
+fig.update_layout(height=300,
+                  width=400,
+                  margin=dict(l=0, r=80, t=0, b=80, pad=0)
+                  )
+col2.plotly_chart(fig, use_container_widte=True)
+
+"## Stats"
 col1, col2, col3, col4 = st.columns(4)
+
+"### Lauren"
 col1.metric("Minutes This Week", min_tw_l, min_tw_l - min_lw_l)
 col2.metric("Average Minutes per Week", avg_min_l)
 # col2.metric("Median Minutes per Week", med_min_l)

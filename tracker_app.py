@@ -78,6 +78,11 @@ combined["Winner"] = combined.apply(lambda row: "None" if row["Minutes (Lauren)"
 combined = combined.sort_values(by="Week Date").reset_index(drop=True)
 
 # Weekly metrics
+now = datetime.combine(date.today(), datetime.min.time())
+this_week = now - timedelta(days=now.weekday())
+last_week = this_week - timedelta(days=7)
+winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].values[0]
+
 try:
     min_tw_l = int(lauren[lauren["Week Date"] == this_week]["Minutes"].sum())
 except TypeError:
@@ -112,10 +117,6 @@ med_wo_t = combined["Workouts (Tara)"].median()
 "# Exercise Competition! :woman-running: :woman-biking: :woman-lifting-weights: :woman_climbing: :woman_in_lotus_position: :muscle:"
 "Here's how it works. You need at least 90 minutes and 3 workouts each week (Monday - Sunday) to be considered for a win.  Points are calculated as `Minutes` * `Workouts`.  The winner is the person with the highest points.  Ties are possible!  If no one gets over the required thresholds, there are two losers."
 add_whitespace(2)
-now = datetime.combine(date.today(), datetime.min.time())
-this_week = now - timedelta(days=now.weekday())
-last_week = this_week - timedelta(days=7)
-winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].values[0]
 
 col1, col2 = st.columns(2)
 col1.markdown(f"#### :trophy: Last Week's Winner (Minutes): {winner_last_week} :trophy:")

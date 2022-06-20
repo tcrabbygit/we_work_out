@@ -110,7 +110,7 @@ try:
     min_tw_l = int(lauren[lauren["Week Date"] == this_week]["Minutes"].sum())
 except TypeError:
     min_tw_l = 0
-Try:
+try:
     wo_tw_l = int(combined[combined["Week Date"] == this_week]["Workouts (Lauren)"])
 except TypeError:
     wo_tw_l = 0
@@ -121,15 +121,15 @@ med_min_l = combined["Minutes (Lauren)"].median()
 avg_wo_l = round(combined["Workouts (Lauren)"].mean(), 1)
 med_wo_l = combined["Workouts (Lauren)"].median()
 
-min_tw_t = int(tara[tara["Week Date"] == this_week]["Minutes"].sum())
+try:
+    min_tw_t = int(tara[tara["Week Date"] == this_week]["Minutes"].sum())
+except TypeError:
+    min_tw_t = 0
 try:
     wo_tw_t = int(combined[combined["Week Date"] == this_week]["Workouts (Tara)"])
 except TypeError:
     wo_tw_t = 0
-try:
-    min_lw_t = int(tara[tara["Week Date"] == last_week]["Minutes"].sum())
-except TypeError:
-    min_lw_t = 0
+min_lw_t = int(tara[tara["Week Date"] == last_week]["Minutes"].sum())
 wo_lw_t = int(combined[combined["Week Date"] == last_week]["Workouts (Tara)"])
 # avg_min_t = round(combined["Minutes (Tara)"].mean(), 1)
 med_min_t = combined["Minutes (Tara)"].median()

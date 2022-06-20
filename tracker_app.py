@@ -106,19 +106,31 @@ col2.plotly_chart(fig, use_container_widte=True)
 
 "## Stats"
 "### Lauren"
-min_tw_l = int(lauren[lauren["Week Date"] == this_week]["Minutes"].sum())
+try:
+    min_tw_l = int(lauren[lauren["Week Date"] == this_week]["Minutes"].sum())
+except TypeError:
+    min_tw_l = 0
+Try:
+    wo_tw_l = int(combined[combined["Week Date"] == this_week]["Workouts (Lauren)"])
+except TypeError:
+    wo_tw_l = 0
 min_lw_l = int(lauren[lauren["Week Date"] == last_week]["Minutes"].sum())
-wo_tw_l = int(combined[combined["Week Date"] == this_week]["Workouts (Lauren)"])
 wo_lw_l = int(combined[combined["Week Date"] == last_week]["Workouts (Lauren)"])
 # avg_min_l = round(combined["Minutes (Lauren)"].mean(), 1)
 med_min_l = combined["Minutes (Lauren)"].median()
 avg_wo_l = round(combined["Workouts (Lauren)"].mean(), 1)
 med_wo_l = combined["Workouts (Lauren)"].median()
 
-wo_tw_t = int(combined[combined["Week Date"] == this_week]["Workouts (Tara)"])
-wo_lw_t = int(combined[combined["Week Date"] == last_week]["Workouts (Tara)"])
 min_tw_t = int(tara[tara["Week Date"] == this_week]["Minutes"].sum())
-min_lw_t = int(tara[tara["Week Date"] == last_week]["Minutes"].sum())
+try:
+    wo_tw_t = int(combined[combined["Week Date"] == this_week]["Workouts (Tara)"])
+except TypeError:
+    wo_tw_t = 0
+try:
+    min_lw_t = int(tara[tara["Week Date"] == last_week]["Minutes"].sum())
+except TypeError:
+    min_lw_t = 0
+wo_lw_t = int(combined[combined["Week Date"] == last_week]["Workouts (Tara)"])
 # avg_min_t = round(combined["Minutes (Tara)"].mean(), 1)
 med_min_t = combined["Minutes (Tara)"].median()
 avg_wo_t = round(combined["Workouts (Tara)"].mean(), 1)

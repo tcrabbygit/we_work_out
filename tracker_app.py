@@ -119,7 +119,7 @@ med_wo_t = combined["Workouts (Tara)"].median()
 add_whitespace(2)
 
 col1, col2 = st.columns(2)
-col1.markdown(f"#### :trophy: Last Week's Winner (Minutes): {winner_last_week} :trophy:")
+col1.markdown(f"##### :trophy: Last Week's Winner (Minutes): {winner_last_week} :trophy:")
 col1.markdown("###### Points Breakdown")
 col1.markdown(f"Lauren: {wo_lw_l} workouts * {min_lw_l} minutes = {wo_lw_l * min_lw_l} points")
 col1.markdown(f"Tara: {wo_lw_t} workouts * {min_lw_t} minutes = {wo_lw_t * min_lw_t} points")

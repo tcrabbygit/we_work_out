@@ -82,6 +82,7 @@ tara["Points"] = tara["Points"].fillna(0)
 combined = lauren.merge(tara, on=["Week", "Week Date"], suffixes=["_l", "_t"]).rename(columns={"Minutes_l": "Minutes (Lauren)", "Minutes_t": "Minutes (Tara)", "Workouts_l": "Workouts (Lauren)", "Workouts_t": "Workouts (Tara)", "Distance_l": "Distance (Lauren)", "Distance_t": "Distance (Tara)", "Points_l": "Points (Lauren)", "Points_t": "Points (Tara)"})
 combined["Winner"] = combined.apply(lambda row: "None :(" if (row["Minutes (Lauren)"] < 90 and row["Minutes (Tara)"] < 90) or (row["Workouts (Lauren)"] < 3 and row["Workouts (Tara)"] < 3) else ("Lauren" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) > (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else ("Tara" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) < (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else "Tie")), axis=1)
 combined = combined.sort_values(by="Week Date").reset_index(drop=True)
+combined
 
 # Weekly metrics
 now = datetime.combine(date.today(), datetime.min.time())
@@ -103,9 +104,10 @@ avg_min_l = round(combined["Minutes (Lauren)"].mean(), 1)
 med_min_l = combined["Minutes (Lauren)"].median()
 avg_wo_l = round(combined["Workouts (Lauren)"].mean(), 1)
 med_wo_l = combined["Workouts (Lauren)"].median()
-pts_tw_l = int(combined[combined["Week Date"] == this_week]["Points (Lauren)"])
-pts_lw_l = int(combined[combined["Week Date"] == last_week]["Points (Lauren)"])
+pts_tw_l = combined[combined["Week Date"] == this_week]["Points (Lauren)"].astype(int).values[0]
+pts_lw_l = combined[combined["Week Date"] == last_week]["Points (Lauren)"].astype(int).values[0]
 avg_pts_l = round(combined["Points (Lauren)"].mean(), 1)
+avg_pts_l
 
 try:
     min_tw_t = int(tara[tara["Week Date"] == this_week]["Minutes"].sum())
@@ -121,8 +123,8 @@ avg_min_t = round(combined["Minutes (Tara)"].mean(), 1)
 med_min_t = combined["Minutes (Tara)"].median()
 avg_wo_t = round(combined["Workouts (Tara)"].mean(), 1)
 med_wo_t = combined["Workouts (Tara)"].median()
-pts_tw_t = int(combined[combined["Week Date"] == this_week]["Points (Tara)"])
-pts_lw_t = int(combined[combined["Week Date"] == last_week]["Points (Tara)"])
+pts_tw_t = combined[combined["Week Date"] == this_week]["Points (Tara)"].astype(int).values[0]
+pts_lw_t = combined[combined["Week Date"] == last_week]["Points (Tara)"].astype(int).values[0]
 avg_pts_t = round(combined["Points (Tara)"].mean(), 1)
 
 # Body
@@ -163,7 +165,7 @@ col2.metric("Avg Minutes per Week", avg_min_l)
 col3.metric("Workouts This Week", wo_tw_l, wo_tw_l - wo_lw_l)
 col4.metric("Avg Workouts per Week", avg_wo_l)
 # col4.metric("Median Workouts per Week", med_wo_l)
-col5.metric("Points This Week", pts_tw_l, pts_tw_l - pts_lw_l)
+col5.metric("Points This Week", int(pts_tw_l), int(pts_tw_l - pts_lw_l))
 col6.metric("Avg Points per Week", avg_pts_l)
 add_whitespace(3)
 
@@ -175,7 +177,7 @@ col2.metric("Avg Minutes per Week", avg_min_t)
 col3.metric("Workouts This Week", wo_tw_t, wo_tw_t - wo_lw_t)
 col4.metric("Avg Workouts per Week", avg_wo_t)
 # col4.metric("Median Workouts per Week", med_wo_t)
-col5.metric("Points This Week", pts_tw_t, pts_tw_t - pts_lw_t)
+col5.metric("Points This Week", int(pts_tw_t), int(pts_tw_t - pts_lw_t))
 col6.metric("Avg Points per Week", avg_pts_t)
 add_whitespace(3)
 

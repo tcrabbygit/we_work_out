@@ -62,7 +62,6 @@ df["Week Date"] = pd.to_datetime(df["Week Date"])
 df["Minutes"] = df["Minutes"].astype(int)
 df["Distance"] = df["Distance"].astype(float)
 df["Week"] = df["Week"].astype(int)
-df["Week Date"].unique()
 
 lauren_df = df[df["Name"] == "Lauren"]
 lauren = lauren_df.groupby(["Week", "Week Date"]).sum().reset_index()

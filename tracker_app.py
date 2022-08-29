@@ -101,8 +101,8 @@ avg_min_l = round(combined["Minutes (Lauren)"].mean(), 1)
 med_min_l = combined["Minutes (Lauren)"].median()
 avg_wo_l = round(combined["Workouts (Lauren)"].mean(), 1)
 med_wo_l = combined["Workouts (Lauren)"].median()
-pts_tw_l = int(combined[combined["Week Date"] == this_week]["Points (Lauren)"])
-pts_lw_l = int(combined[combined["Week Date"] == last_week]["Points (Lauren)"])
+pts_tw_l = combined[combined["Week Date"] == this_week]["Points (Lauren)"]
+pts_lw_l = combined[combined["Week Date"] == last_week]["Points (Lauren)"]
 avg_pts_l = round(combined["Points (Lauren)"].mean(), 1)
 
 try:
@@ -119,8 +119,8 @@ avg_min_t = round(combined["Minutes (Tara)"].mean(), 1)
 med_min_t = combined["Minutes (Tara)"].median()
 avg_wo_t = round(combined["Workouts (Tara)"].mean(), 1)
 med_wo_t = combined["Workouts (Tara)"].median()
-pts_tw_t = int(combined[combined["Week Date"] == this_week]["Points (Tara)"])
-pts_lw_t = int(combined[combined["Week Date"] == last_week]["Points (Tara)"])
+pts_tw_t = combined[combined["Week Date"] == this_week]["Points (Tara)"]
+pts_lw_t = combined[combined["Week Date"] == last_week]["Points (Tara)"]
 avg_pts_t = round(combined["Points (Tara)"].mean(), 1)
 
 # Body

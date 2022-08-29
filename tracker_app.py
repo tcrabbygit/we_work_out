@@ -67,14 +67,18 @@ lauren_df = df[df["Name"] == "Lauren"]
 lauren = lauren_df.groupby(["Week", "Week Date"]).sum().reset_index()
 lauren_wo = lauren_df[lauren_df["Minutes"] > 0].groupby(["Week", "Week Date"])["Minutes"].size().rename("Workouts").reset_index()
 lauren = lauren.merge(lauren_wo, on=["Week", "Week Date"], how="left").fillna(0)
+lauren["Workouts"] = lauren["Workouts"].astype(int)
+lauren["Points"] = (lauren["Minutes"] * lauren["Workouts"]).astype(int)
 
 tara_df = df[df["Name"] == "Tara"]
 tara = tara_df.groupby(["Week", "Week Date"]).sum().reset_index()
 tara_wo = tara_df[tara_df["Minutes"] > 0].groupby(["Week", "Week Date"])["Minutes"].size().rename("Workouts").reset_index()
 tara = tara.merge(tara_wo, on=["Week", "Week Date"], how="left").fillna(0)
+tara["Workouts"] = tara["Workouts"].astype(int)
+tara["Points"] = (tara["Minutes"] * tara["Workouts"]).astype(int)
 
-combined = lauren.merge(tara, on=["Week", "Week Date"], suffixes=["_l", "_t"]).rename(columns={"Minutes_l": "Minutes (Lauren)", "Minutes_t": "Minutes (Tara)", "Workouts_l": "Workouts (Lauren)", "Workouts_t": "Workouts (Tara)", "Distance_l": "Distance (Lauren)", "Distance_t": "Distance (Tara)"})
-combined["Winner"] = combined.apply(lambda row: "None" if row["Minutes (Lauren)"] < 100 and row["Minutes (Tara)"] < 100 and row["Workouts (Lauren)"] < 3 and row["Workouts (Tara)"] < 3 else ("Lauren" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) > (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else ("Tara" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) < (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else "Tie")), axis=1)
+combined = lauren.merge(tara, on=["Week", "Week Date"], suffixes=["_l", "_t"]).rename(columns={"Minutes_l": "Minutes (Lauren)", "Minutes_t": "Minutes (Tara)", "Workouts_l": "Workouts (Lauren)", "Workouts_t": "Workouts (Tara)", "Distance_l": "Distance (Lauren)", "Distance_t": "Distance (Tara)", "Points_l": "Points (Lauren)", "Points_t": "Points (Tara)"})
+combined["Winner"] = combined.apply(lambda row: "None :(" if (row["Minutes (Lauren)"] < 90 and row["Minutes (Tara)"] < 90) or (row["Workouts (Lauren)"] < 3 and row["Workouts (Tara)"] < 3) else ("Lauren" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) > (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else ("Tara" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) < (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else "Tie")), axis=1)
 combined = combined.sort_values(by="Week Date").reset_index(drop=True)
 
 # Weekly metrics
@@ -97,6 +101,9 @@ avg_min_l = round(combined["Minutes (Lauren)"].mean(), 1)
 med_min_l = combined["Minutes (Lauren)"].median()
 avg_wo_l = round(combined["Workouts (Lauren)"].mean(), 1)
 med_wo_l = combined["Workouts (Lauren)"].median()
+pts_tw_l = int(combined[combined["Week Date"] == this_week]["Points (Lauren)"])
+pts_lw_l = int(combined[combined["Week Date"] == last_week]["Points (Lauren)"])
+avg_pts_l = round(combined["Points (Lauren)"].mean(), 1)
 
 try:
     min_tw_t = int(tara[tara["Week Date"] == this_week]["Minutes"].sum())
@@ -112,6 +119,9 @@ avg_min_t = round(combined["Minutes (Tara)"].mean(), 1)
 med_min_t = combined["Minutes (Tara)"].median()
 avg_wo_t = round(combined["Workouts (Tara)"].mean(), 1)
 med_wo_t = combined["Workouts (Tara)"].median()
+pts_tw_t = int(combined[combined["Week Date"] == this_week]["Points (Tara)"])
+pts_lw_t = int(combined[combined["Week Date"] == last_week]["Points (Tara)"])
+avg_pts_t = round(combined["Points (Tara)"].mean(), 1)
 
 # Body
 "# Exercise Competition! :woman-running: :woman-biking: :woman-lifting-weights: :woman_climbing: :woman_in_lotus_position: :muscle:"
@@ -119,17 +129,20 @@ med_wo_t = combined["Workouts (Tara)"].median()
 add_whitespace(2)
 
 col1, col2 = st.columns(2)
-col1.markdown(f"##### :trophy: Last Week's Winner (Minutes): {winner_last_week} :trophy:")
-col1.markdown("###### Points Breakdown")
-col1.markdown(f"Lauren: {wo_lw_l} workouts * {min_lw_l} minutes = {wo_lw_l * min_lw_l} points")
-col1.markdown(f"Tara: {wo_lw_t} workouts * {min_lw_t} minutes = {wo_lw_t * min_lw_t} points")
+col1.markdown(f"##### :trophy: Last Week's Winner: {winner_last_week} :trophy:")
+col1.markdown(f"###### Points Breakdown {last_week.date()}")
+
+pts_lw = pd.concat([lauren[lauren["Week Date"] == last_week], tara[tara["Week Date"] == last_week]], ignore_index=True)
+pts_lw = pts_lw[["Minutes", "Workouts", "Points"]]
+pts_lw = pd.concat([pd.DataFrame(["Lauren", "Tara"], columns=["Name"]), pts_lw], axis=1)
+col1.dataframe(pts_lw)
 
 col2.markdown("##### :trophy: Weekly Winners :trophy:")
 fig = px.pie(combined["Winner"].value_counts().reset_index(),
              values="Winner",
              names="index",
              color="index",
-             color_discrete_map={"None": "#EDF2F4",
+             color_discrete_map={"None :(": "#EDF2F4",
                                  "Tie": "#8D99AE",
                                  "Lauren": "#D80032",
                                  "Tara": "#2B2D42"})
@@ -140,28 +153,40 @@ fig.update_layout(height=300,
 col2.plotly_chart(fig, use_container_widte=True)
 
 "## Stats"
-col1, col2, col3, col4 = st.columns(4)
-
 "### Lauren"
+col1, col2, col3, col4, col5, col6 = st.columns(6)
 col1.metric("Minutes This Week", min_tw_l, min_tw_l - min_lw_l)
-col2.metric("Average Minutes per Week", avg_min_l)
+col2.metric("Avg Minutes per Week", avg_min_l)
 # col2.metric("Median Minutes per Week", med_min_l)
 col3.metric("Workouts This Week", wo_tw_l, wo_tw_l - wo_lw_l)
-col4.metric("Average Workouts per Week", avg_wo_l)
+col4.metric("Avg Workouts per Week", avg_wo_l)
 # col4.metric("Median Workouts per Week", med_wo_l)
-add_whitespace(2)
-
-"### Tara"
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Minutes This Week (Tara)", min_tw_t, min_tw_t - min_lw_t)
-col2.metric("Average Minutes per Week", avg_min_t)
-# col2.metric("Median Minutes per Week", med_min_t)
-col3.metric("Workouts This Week", wo_tw_t, wo_tw_t - wo_lw_t)
-col4.metric("Average Workouts per Week", avg_wo_t)
-# col4.metric("Median Workouts per Week", med_wo_t)
+col5.metric("Points This Week", pts_tw_l, pts_tw_l - pts_lw_l)
+col6.metric("Avg Points per Week", avg_pts_l)
 add_whitespace(3)
 
-"## Data"
+"### Tara"
+col1, col2, col3, col4, col5, col6 = st.columns(6)
+col1.metric("Minutes This Week (Tara)", min_tw_t, min_tw_t - min_lw_t)
+col2.metric("Avg Minutes per Week", avg_min_t)
+# col2.metric("Median Minutes per Week", med_min_t)
+col3.metric("Workouts This Week", wo_tw_t, wo_tw_t - wo_lw_t)
+col4.metric("Avg Workouts per Week", avg_wo_t)
+# col4.metric("Median Workouts per Week", med_wo_t)
+col5.metric("Points This Week", pts_tw_t, pts_tw_t - pts_lw_t)
+col6.metric("Avg Points per Week", avg_pts_t)
+add_whitespace(3)
+
+"## Charts & Data"
+"### Points"
+fig = go.Figure()
+fig.add_trace(go.Bar(x=combined["Week Date"], y=combined["Points (Lauren)"], name="Lauren", marker_color="#d90429"))
+fig.add_trace(go.Bar(x=combined["Week Date"], y=combined["Points (Tara)"], name="Tara", marker_color="#2b2d42"))
+fig.update_layout(plot_bgcolor="#FCFDFD", xaxis_title="Week", yaxis_title="Count", margin=dict(l=0, r=0, t=0, b=0, pad=0), height=400, legend_yanchor="middle", legend_y=0.5)
+fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor="#D7DBE2")
+st.plotly_chart(fig, use_container_width=True)
+add_whitespace(2)
+
 "### Minutes"
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=combined["Week Date"], y=combined["Minutes (Lauren)"], mode="lines+markers", name="Lauren", line=dict(color="#d90429")))

@@ -69,6 +69,7 @@ lauren_wo = lauren_df[lauren_df["Minutes"] > 0].groupby(["Week", "Week Date"])["
 lauren = lauren.merge(lauren_wo, on=["Week", "Week Date"], how="left").fillna(0)
 lauren["Workouts"] = lauren["Workouts"].astype(int)
 lauren["Points"] = (lauren["Minutes"] * lauren["Workouts"]).astype(int)
+lauren["Points"] = lauren["Points"].fillna(0)
 
 tara_df = df[df["Name"] == "Tara"]
 tara = tara_df.groupby(["Week", "Week Date"]).sum().reset_index()
@@ -76,6 +77,7 @@ tara_wo = tara_df[tara_df["Minutes"] > 0].groupby(["Week", "Week Date"])["Minute
 tara = tara.merge(tara_wo, on=["Week", "Week Date"], how="left").fillna(0)
 tara["Workouts"] = tara["Workouts"].astype(int)
 tara["Points"] = (tara["Minutes"] * tara["Workouts"]).astype(int)
+tara["Points"] = tara["Points"].fillna(0)
 
 combined = lauren.merge(tara, on=["Week", "Week Date"], suffixes=["_l", "_t"]).rename(columns={"Minutes_l": "Minutes (Lauren)", "Minutes_t": "Minutes (Tara)", "Workouts_l": "Workouts (Lauren)", "Workouts_t": "Workouts (Tara)", "Distance_l": "Distance (Lauren)", "Distance_t": "Distance (Tara)", "Points_l": "Points (Lauren)", "Points_t": "Points (Tara)"})
 combined["Winner"] = combined.apply(lambda row: "None :(" if (row["Minutes (Lauren)"] < 90 and row["Minutes (Tara)"] < 90) or (row["Workouts (Lauren)"] < 3 and row["Workouts (Tara)"] < 3) else ("Lauren" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) > (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else ("Tara" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) < (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else "Tie")), axis=1)

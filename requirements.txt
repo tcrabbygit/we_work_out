@@ -1,4 +1,4 @@
-pandas
+pandas<=1.4.0
 streamlit
 plotly
 google-cloud-bigquery

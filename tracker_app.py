@@ -18,7 +18,7 @@ log_name = form.multiselect("Name", ["Lauren", "Tara"], default=["Lauren", "Tara
 log_date = form.date_input("Date")
 log_activity = form.selectbox("Activity", ["Bike", "Climb", "Eliptical", "Hike", "Stretching", "Yoga", "Walk", "Weights", "Other"])
 log_minutes = form.number_input("Minutes", 0, 100, 30, 5)
-log_distance = form.number_input("Distance (in miles)", step=0.01)
+log_distance = form.number_input("Distance (in miles)", step=0.1)
 log_notes = form.text_area("Workout Notes", value="")
 
 new_data = get_data(spreadsheet_id, "new_data!A:H")

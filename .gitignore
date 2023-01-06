@@ -2,3 +2,4 @@
 __pycache__/funcs.cpython-38.pyc
 .streamlit/secrets.toml
 test_df.py
+*.pyc

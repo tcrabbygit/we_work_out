@@ -3,15 +3,12 @@ import streamlit as st
 from datetime import timedelta, datetime, date
 import plotly.graph_objects as go
 import plotly.express as px
-from funcs import get_data, write_to_sheet, check_input, add_whitespace, write_new_rows
+from funcs import get_data, write_to_sheet, check_input, add_whitespace, write_new_rows, prep_by_name, weekly_minutes_workouts_points, weekly_aggs
 
 # Settings
 st.set_page_config(page_title="Fitness Tracker!", page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
 
 # Sidebar
-spreadsheet_id = "1BAWUiSI8jV0hSmaD9b_68CaRgSca9J_Odb1TpWRYuZU"
-range_name = "data!A:G"
-
 st.sidebar.markdown("### Log Workout :muscle:")
 form = st.sidebar.form("log_time")
 log_name = form.multiselect("Name", ["Lauren", "Tara"], default=["Lauren", "Tara"])
@@ -21,6 +18,7 @@ log_minutes = form.number_input("Minutes", 0, 100, 30, 5)
 log_distance = form.number_input("Distance (in miles)", step=0.1)
 log_notes = form.text_area("Workout Notes", value="")
 
+spreadsheet_id = "1BAWUiSI8jV0hSmaD9b_68CaRgSca9J_Odb1TpWRYuZU"
 new_data = get_data(spreadsheet_id, "new_data!A:H")
 new_data = pd.DataFrame(new_data[1:], columns=new_data[0])
 cols = ["Day", "Week", "Week Date", "Name", "Activity", "Minutes", "Distance", "Notes"]
@@ -49,7 +47,9 @@ if submit_log:
 # response = request.execute()
 
 # Data
+range_name = "data!A:G"
 rows = get_data(spreadsheet_id, range_name)
+
 df = pd.DataFrame(rows[1:], columns=rows[0])
 row_updates = get_data(spreadsheet_id, "new_data!A:H")
 if len(row_updates) > 0:
@@ -63,21 +63,8 @@ df["Minutes"] = df["Minutes"].astype(int)
 df["Distance"] = df["Distance"].astype(float)
 df["Week"] = df["Week"].astype(int)
 
-lauren_df = df[df["Name"] == "Lauren"]
-lauren = lauren_df.groupby(["Week", "Week Date"]).sum().reset_index()
-lauren_wo = lauren_df[lauren_df["Minutes"] > 0].groupby(["Week", "Week Date"])["Minutes"].size().rename("Workouts").reset_index()
-lauren = lauren.merge(lauren_wo, on=["Week", "Week Date"], how="left").fillna(0)
-lauren["Workouts"] = lauren["Workouts"].astype(int)
-lauren["Points"] = (lauren["Minutes"] * lauren["Workouts"]).astype(int)
-lauren["Points"] = lauren["Points"].fillna(0)
-
-tara_df = df[df["Name"] == "Tara"]
-tara = tara_df.groupby(["Week", "Week Date"]).sum().reset_index()
-tara_wo = tara_df[tara_df["Minutes"] > 0].groupby(["Week", "Week Date"])["Minutes"].size().rename("Workouts").reset_index()
-tara = tara.merge(tara_wo, on=["Week", "Week Date"], how="left").fillna(0)
-tara["Workouts"] = tara["Workouts"].astype(int)
-tara["Points"] = (tara["Minutes"] * tara["Workouts"]).astype(int)
-tara["Points"] = tara["Points"].fillna(0)
+lauren = prep_by_name(df, "Lauren")
+tara = prep_by_name(df, "Tara")
 
 combined = lauren.merge(tara, on=["Week", "Week Date"], suffixes=["_l", "_t"]).rename(columns={"Minutes_l": "Minutes (Lauren)", "Minutes_t": "Minutes (Tara)", "Workouts_l": "Workouts (Lauren)", "Workouts_t": "Workouts (Tara)", "Distance_l": "Distance (Lauren)", "Distance_t": "Distance (Tara)", "Points_l": "Points (Lauren)", "Points_t": "Points (Tara)"})
 combined["Winner"] = combined.apply(lambda row: "None :(" if (row["Minutes (Lauren)"] < 90 and row["Minutes (Tara)"] < 90) or (row["Workouts (Lauren)"] < 3 and row["Workouts (Tara)"] < 3) else ("Lauren" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) > (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else ("Tara" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) < (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else "Tie")), axis=1)
@@ -89,41 +76,13 @@ this_week = now - timedelta(days=now.weekday())
 last_week = this_week - timedelta(days=7)
 winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].values[0]
 
-try:
-    min_tw_l = int(lauren[lauren["Week Date"] == this_week]["Minutes"].sum())
-except TypeError:
-    min_tw_l = 0
-try:
-    wo_tw_l = int(combined[combined["Week Date"] == this_week]["Workouts (Lauren)"])
-except TypeError:
-    wo_tw_l = 0
-min_lw_l = int(lauren[lauren["Week Date"] == last_week]["Minutes"].sum())
-wo_lw_l = int(combined[combined["Week Date"] == last_week]["Workouts (Lauren)"])
-avg_min_l = round(combined["Minutes (Lauren)"].mean(), 1)
-med_min_l = combined["Minutes (Lauren)"].median()
-avg_wo_l = round(combined["Workouts (Lauren)"].mean(), 1)
-med_wo_l = combined["Workouts (Lauren)"].median()
-pts_tw_l = int(combined[combined["Week Date"] == this_week]["Points (Lauren)"].sum())
-pts_lw_l = int(combined[combined["Week Date"] == last_week]["Points (Lauren)"].sum())
-avg_pts_l = round(combined["Points (Lauren)"].mean(), 1)
+min_tw_l, wo_tw_l, pts_tw_l = weekly_minutes_workouts_points(lauren, this_week)
+min_lw_l, wo_lw_l, pts_lw_l = weekly_minutes_workouts_points(lauren, last_week)
+avg_min_l, med_min_l, avg_wo_l, med_wo_l, avg_pts_l = weekly_aggs(lauren)
 
-try:
-    min_tw_t = int(tara[tara["Week Date"] == this_week]["Minutes"].sum())
-except TypeError:
-    min_tw_t = 0
-try:
-    wo_tw_t = int(combined[combined["Week Date"] == this_week]["Workouts (Tara)"])
-except TypeError:
-    wo_tw_t = 0
-min_lw_t = int(tara[tara["Week Date"] == last_week]["Minutes"].sum())
-wo_lw_t = int(combined[combined["Week Date"] == last_week]["Workouts (Tara)"])
-avg_min_t = round(combined["Minutes (Tara)"].mean(), 1)
-med_min_t = combined["Minutes (Tara)"].median()
-avg_wo_t = round(combined["Workouts (Tara)"].mean(), 1)
-med_wo_t = combined["Workouts (Tara)"].median()
-pts_tw_t = int(combined[combined["Week Date"] == this_week]["Points (Tara)"].sum())
-pts_lw_t = int(combined[combined["Week Date"] == last_week]["Points (Tara)"].sum())
-avg_pts_t = round(combined["Points (Tara)"].mean(), 1)
+min_tw_t, wo_tw_t, pts_tw_t = weekly_minutes_workouts_points(tara, this_week)
+min_lw_t, wo_lw_t, pts_lw_t = weekly_minutes_workouts_points(tara, last_week)
+avg_min_t, med_min_t, avg_wo_t, med_wo_t, avg_pts_t = weekly_aggs(tara)
 
 # Body
 "# Exercise Competition! :woman-running: :woman-biking: :woman-lifting-weights: :woman_climbing: :woman_in_lotus_position: :muscle:"

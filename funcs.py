@@ -41,6 +41,49 @@ def write_to_sheet(df, spreadsheet_id, range_):
     return request
 
 
+def prep_by_name(df, name):
+    named_df = df[df["Name"] == name]
+    named_grp = named_df.groupby(["Week", "Week Date"]).sum().reset_index()
+    named_grp_wo = named_df[named_df["Minutes"] > 0].groupby(["Week", "Week Date"])["Minutes"].size().rename("Workouts").reset_index()
+    named_grp = named_grp.merge(named_grp_wo, on=["Week", "Week Date"], how="left").fillna(0)
+    named_grp["Workouts"] = named_grp["Workouts"].astype(int)
+    named_grp["Points"] = (named_grp["Minutes"] * named_grp["Workouts"]).astype(int)
+    named_grp["Points"] = named_grp["Points"].fillna(0)
+    return named_grp
+
+
+def weekly_minutes_workouts_points(named_df, week):
+    # Minutes
+    try:
+        minutes = int(named_df[named_df["Week Date"] == week]["Minutes"].sum())
+    except TypeError:
+        minutes = 0
+    
+    # Workouts
+    try:
+        workouts = int(named_df[named_df["Week Date"] == week]["Workouts"].sum())
+    except TypeError:
+        workouts = 0
+
+    # Points
+    try:
+        points = int(named_df[named_df["Week Date"] == week]["Points"].sum())
+    except TypeError:
+        points = 0
+    
+    return minutes, workouts, points
+
+
+def weekly_aggs(named_df):
+    avg_min = round(named_df["Minutes"].mean(), 1)
+    med_min = named_df["Minutes"].median()
+    avg_wo = round(named_df["Workouts"].mean(), 1)
+    med_wo = named_df["Workouts"].median()
+    avg_pts = round(named_df["Points"].mean(), 1)
+
+    return avg_min, med_min, avg_wo, med_wo, avg_pts
+
+
 # @st.experimental_memo
 # @st.cache(allow_output_mutation=True)
 def get_and_melt_raw_data(spreadsheet_id, range_name):

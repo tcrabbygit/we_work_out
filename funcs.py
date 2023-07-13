@@ -49,6 +49,7 @@ def prep_by_name(df, name):
     named_grp["Workouts"] = named_grp["Workouts"].astype(int)
     named_grp["Points"] = (named_grp["Minutes"] * named_grp["Workouts"]).astype(int)
     named_grp["Points"] = named_grp["Points"].fillna(0)
+    named_grp["Week Date"] = pd.to_datetime(named_grp["Week Date"])
     return named_grp
 
 

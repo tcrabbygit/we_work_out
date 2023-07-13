@@ -90,9 +90,9 @@ col1.dataframe(pts_lw)
 
 col2.markdown("##### :trophy: Weekly Winners :trophy:")
 fig = px.pie(combined["Winner"].value_counts().reset_index(),
-             values="Winner",
-              names=combined["Winner"].value_counts().reset_index().index,
-              color=combined["Winner"].value_counts().reset_index().index,
+             values="count",
+             names="Winner",
+             color="Winner",
              color_discrete_map={"None :(": "#EDF2F4",
                                  "Tie": "#8D99AE",
                                  "Lauren": "#D80032",

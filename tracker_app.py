@@ -3,7 +3,7 @@ import streamlit as st
 from datetime import timedelta, datetime, date
 import plotly.graph_objects as go
 import plotly.express as px
-from funcs import get_data, write_to_sheet, check_input, add_whitespace, write_new_rows, prep_by_name, weekly_minutes_workouts_points, weekly_aggs
+from funcs import get_data, historic_and_new_data, write_to_sheet, check_input, add_whitespace, write_new_rows, prep_by_name, weekly_minutes_workouts_points, weekly_aggs
 
 # Settings
 st.set_page_config(page_title="Fitness Tracker!", page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
@@ -48,24 +48,12 @@ if submit_log:
 
 # Data
 range_name = "data!A:G"
-rows = get_data(spreadsheet_id, range_name)
-
-df = pd.DataFrame(rows[1:], columns=rows[0])
-row_updates = get_data(spreadsheet_id, "new_data!A:H")
-if len(row_updates) > 0:
-    new_rows = pd.DataFrame(row_updates[1:], columns=row_updates[0])
-    df = pd.concat([df, new_rows])
-    df = df.drop_duplicates().sort_values(by="Day").reset_index(drop=True)
-
-df["Day"] = pd.to_datetime(df["Day"])
-df["Minutes"] = df["Minutes"].astype(int)
-df["Distance"] = df["Distance"].astype(float)
-df["Week"] = df["Week"].astype(int)
+df = historic_and_new_data(range_name, spreadsheet_id)
 
 lauren = prep_by_name(df, "Lauren")
 tara = prep_by_name(df, "Tara")
 
-df["Week Date"] = pd.to_datetime(df["Week Date"])
+df["Day"] = pd.to_datetime(df["Day"])
 df["Week Date"] = pd.to_datetime(df["Week Date"])
 
 combined = lauren.merge(tara, on=["Week", "Week Date"], suffixes=["_l", "_t"]).rename(columns={"Minutes_l": "Minutes (Lauren)", "Minutes_t": "Minutes (Tara)", "Workouts_l": "Workouts (Lauren)", "Workouts_t": "Workouts (Tara)", "Distance_l": "Distance (Lauren)", "Distance_t": "Distance (Tara)", "Points_l": "Points (Lauren)", "Points_t": "Points (Tara)"})
@@ -103,8 +91,8 @@ col1.dataframe(pts_lw)
 col2.markdown("##### :trophy: Weekly Winners :trophy:")
 fig = px.pie(combined["Winner"].value_counts().reset_index(),
              values="Winner",
-             names="index",
-             color="index",
+              names=combined["Winner"].value_counts().reset_index().index,
+              color=combined["Winner"].value_counts().reset_index().index,
              color_discrete_map={"None :(": "#EDF2F4",
                                  "Tie": "#8D99AE",
                                  "Lauren": "#D80032",

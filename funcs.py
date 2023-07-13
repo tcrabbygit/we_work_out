@@ -32,6 +32,23 @@ def get_sheets(spreadsheet_id):
     return sheets, titles, ids
 
 
+def historic_and_new_data(range_name, spreadsheet_id):
+    rows = get_data(spreadsheet_id, range_name)
+    df = pd.DataFrame(rows[1:], columns=rows[0])
+
+    row_updates = get_data(spreadsheet_id, "new_data!A:H")
+    if len(row_updates) > 0:
+        new_rows = pd.DataFrame(row_updates[1:], columns=row_updates[0])
+        df = pd.concat([df, new_rows])
+        df = df.drop_duplicates().sort_values(by="Day").reset_index(drop=True)
+
+    df["Minutes"] = df["Minutes"].astype(int)
+    df["Distance"] = df["Distance"].astype(float)
+    df["Week"] = df["Week"].astype(int)
+
+    return df
+
+
 def write_to_sheet(df, spreadsheet_id, range_):
     value_input_option = "USER_ENTERED"
     data = [df.columns.values.tolist()]

@@ -58,7 +58,6 @@ if len(row_updates) > 0:
     df = df.drop_duplicates().sort_values(by="Day").reset_index(drop=True)
 
 df["Day"] = pd.to_datetime(df["Day"])
-# df["Week Date"] = pd.to_datetime(df["Week Date"])
 df["Minutes"] = df["Minutes"].astype(int)
 df["Distance"] = df["Distance"].astype(float)
 df["Week"] = df["Week"].astype(int)
@@ -66,6 +65,7 @@ df["Week"] = df["Week"].astype(int)
 lauren = prep_by_name(df, "Lauren")
 tara = prep_by_name(df, "Tara")
 
+df["Week Date"] = pd.to_datetime(df["Week Date"])
 df["Week Date"] = pd.to_datetime(df["Week Date"])
 
 combined = lauren.merge(tara, on=["Week", "Week Date"], suffixes=["_l", "_t"]).rename(columns={"Minutes_l": "Minutes (Lauren)", "Minutes_t": "Minutes (Tara)", "Workouts_l": "Workouts (Lauren)", "Workouts_t": "Workouts (Tara)", "Distance_l": "Distance (Lauren)", "Distance_t": "Distance (Tara)", "Points_l": "Points (Lauren)", "Points_t": "Points (Tara)"})

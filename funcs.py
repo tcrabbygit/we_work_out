@@ -60,7 +60,7 @@ def write_to_sheet(df, spreadsheet_id, range_):
 
 def prep_by_name(df, name):
     named_df = df[df["Name"] == name]
-    named_grp = named_df.groupby(["Week", "Week Date"]).sum().reset_index()
+    named_grp = named_df.groupby(["Week", "Week Date"])[["Minutes", "Distance"]].sum().reset_index()
     named_grp_wo = named_df[named_df["Minutes"] > 0].groupby(["Week", "Week Date"])["Minutes"].size().rename("Workouts").reset_index()
     named_grp = named_grp.merge(named_grp_wo, on=["Week", "Week Date"], how="left").fillna(0)
     named_grp["Workouts"] = named_grp["Workouts"].astype(int)

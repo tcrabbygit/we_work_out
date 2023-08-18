@@ -77,6 +77,8 @@ avg_min_t, med_min_t, avg_wo_t, med_wo_t, avg_pts_t = weekly_aggs(tara)
 # Body
 "# Exercise Competition! :woman-running: :woman-biking: :woman-lifting-weights: :woman_climbing: :woman_in_lotus_position: :muscle:"
 "Here's how it works. You need at least 90 minutes and 3 workouts each week (Monday - Sunday) to be considered for a win.  Points are calculated as `Minutes` * `Workouts`.  The winner is the person with the highest points.  Ties are possible!  If no one gets over the required thresholds, there are two losers."
+st.markdown(
+    "Tracker sheet located [here](https://docs.google.com/spreadsheets/d/1BAWUiSI8jV0hSmaD9b_68CaRgSca9J_Odb1TpWRYuZU/edit?usp=sharing)")
 add_whitespace(2)
 
 col1, col2 = st.columns(2)

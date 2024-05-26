@@ -3,7 +3,7 @@ import streamlit as st
 from datetime import timedelta, datetime, date
 import plotly.graph_objects as go
 import plotly.express as px
-from funcs import get_data, historic_and_new_data, write_to_sheet, check_input, add_whitespace, write_new_rows, prep_by_name, weekly_minutes_workouts_points, weekly_aggs
+from funcs import get_data, historic_and_new_data, write_to_sheet, check_input, add_whitespace, write_new_rows, prep_by_name, weekly_minutes_workouts_points, weekly_aggs, week_dates, combine_indiviual_dfs
 
 # Settings
 st.set_page_config(page_title="Fitness Tracker!", page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
@@ -14,11 +14,13 @@ form = st.sidebar.form("log_time")
 log_name = form.multiselect("Name", ["Lauren", "Tara"], default=["Lauren", "Tara"])
 log_date = form.date_input("Date")
 log_activity = form.selectbox("Activity", ["Bike", "Climb", "Eliptical", "Hike", "Stretching", "Yoga", "Walk", "Weights", "Other"])
-log_minutes = form.number_input("Minutes", 0, 100, 30, 5)
+log_minutes = form.number_input("Minutes", 0, 180, 30, 5)
 log_distance = form.number_input("Distance (in miles)", step=0.1)
 log_notes = form.text_area("Workout Notes", value="")
 
 spreadsheet_id = "1BAWUiSI8jV0hSmaD9b_68CaRgSca9J_Odb1TpWRYuZU"
+# # Testing Sheet
+# spreadsheet_id = "1tfM_sbc2wAlrBl6rP9dRdKCU2w10XhXGyoxP5u5EHtg"
 new_data = get_data(spreadsheet_id, "new_data!A:H")
 new_data = pd.DataFrame(new_data[1:], columns=new_data[0])
 cols = ["Day", "Week", "Week Date", "Name", "Activity", "Minutes", "Distance", "Notes"]
@@ -49,22 +51,26 @@ if submit_log:
 # Data
 range_name = "data!A:G"
 df = historic_and_new_data(range_name, spreadsheet_id)
-
+df["Activity"] = df["Activity"].str.lower()
+df["Activity"] = df["Activity"].str.strip()
 lauren = prep_by_name(df, "Lauren")
 tara = prep_by_name(df, "Tara")
-
 df["Day"] = pd.to_datetime(df["Day"])
 df["Week Date"] = pd.to_datetime(df["Week Date"])
 
-combined = lauren.merge(tara, on=["Week", "Week Date"], suffixes=["_l", "_t"]).rename(columns={"Minutes_l": "Minutes (Lauren)", "Minutes_t": "Minutes (Tara)", "Workouts_l": "Workouts (Lauren)", "Workouts_t": "Workouts (Tara)", "Distance_l": "Distance (Lauren)", "Distance_t": "Distance (Tara)", "Points_l": "Points (Lauren)", "Points_t": "Points (Tara)"})
-combined["Winner"] = combined.apply(lambda row: "None :(" if (row["Minutes (Lauren)"] < 90 and row["Minutes (Tara)"] < 90) or (row["Workouts (Lauren)"] < 3 and row["Workouts (Tara)"] < 3) else ("Lauren" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) > (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else ("Tara" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) < (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else "Tie")), axis=1)
-combined = combined.sort_values(by="Week Date").reset_index(drop=True)
-
-# Weekly metrics
+first_week = df["Week Date"].min()
 now = datetime.combine(date.today(), datetime.min.time())
 this_week = now - timedelta(days=now.weekday())
 last_week = this_week - timedelta(days=7)
-winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].values[0]
+
+weeks = week_dates(first_week, this_week)
+combined = combine_indiviual_dfs(lauren, tara, weeks)
+
+# Weekly metrics
+try:
+    winner_last_week = combined.loc[combined["Week Date"] == last_week, "Winner"].values[0]
+except:
+    winner_last_week = "hmm, looks like a problem, better check the data"
 
 min_tw_l, wo_tw_l, pts_tw_l = weekly_minutes_workouts_points(lauren, this_week)
 min_lw_l, wo_lw_l, pts_lw_l = weekly_minutes_workouts_points(lauren, last_week)
@@ -85,10 +91,11 @@ col1, col2 = st.columns(2)
 col1.markdown(f"##### :trophy: Last Week's Winner: {winner_last_week} :trophy:")
 col1.markdown(f"###### Points Breakdown {last_week.date()}")
 
-pts_lw = pd.concat([lauren[lauren["Week Date"] == last_week], tara[tara["Week Date"] == last_week]], ignore_index=True)
+pts_lw = pd.concat([lauren[lauren["Week Date"] == last_week], 
+                    tara[tara["Week Date"] == last_week]], ignore_index=True)
 pts_lw = pts_lw[["Minutes", "Workouts", "Points"]]
 pts_lw = pd.concat([pd.DataFrame(["Lauren", "Tara"], columns=["Name"]), pts_lw], axis=1)
-col1.dataframe(pts_lw)
+col1.dataframe(pts_lw, hide_index=True)
 
 col2.markdown("##### :trophy: Weekly Winners :trophy:")
 fig = px.pie(combined["Winner"].value_counts().reset_index(),
@@ -131,6 +138,54 @@ col6.metric("Avg Points per Week", avg_pts_t)
 add_whitespace(3)
 
 "## Charts & Data"
+"### Exercise Types"
+col1, col2 = st.columns(2)
+col1.markdown("##### Lauren")
+fig = px.pie(df[(df["Name"] == "Lauren") & (df["Activity"] != "")].Activity.value_counts().reset_index(),
+             values="count",
+             names="Activity",
+             color="Activity",
+             color_discrete_map={
+                "walk": "#8D99AE",
+                "climb": "#D80032",
+                "yoga": "#2B2D42",
+                "bike": "#9BAA4E",
+                "other": "#CECEA6",
+                "elliptical": "#F4F2DC",
+                "weights": "#DFC685",
+                "stretching": "#214A51",
+                "hike": "#545A66",
+                "cleaning": "#B48354"
+             })
+fig.update_layout(height=300,
+                  width=400,
+                  margin=dict(l=0, r=80, t=0, b=80, pad=0)
+                  )
+col1.plotly_chart(fig, use_container_width=True)
+
+col2.markdown("##### Tara")
+fig = px.pie(df[(df["Name"] == "Tara") & (df["Activity"] != "")].Activity.value_counts().reset_index(),
+             values="count",
+             names="Activity",
+             color="Activity",
+             color_discrete_map={
+                "walk": "#8D99AE",
+                "climb": "#D80032",
+                "yoga": "#2B2D42",
+                "bike": "#9BAA4E",
+                "other": "#CECEA6",
+                "elliptical": "#F4F2DC",
+                "weights": "#DFC685",
+                "stretching": "#214A51",
+                "hike": "#545A66",
+                "cleaning": "#B48354"
+             })
+fig.update_layout(height=300,
+                  width=400,
+                  margin=dict(l=0, r=80, t=0, b=80, pad=0)
+                  )
+col2.plotly_chart(fig, use_container_width=True)
+
 "### Points"
 fig = go.Figure()
 fig.add_trace(go.Bar(x=combined["Week Date"], y=combined["Points (Lauren)"], name="Lauren", marker_color="#d90429"))

@@ -70,6 +70,30 @@ def prep_by_name(df, name):
     return named_grp
 
 
+def week_dates(start_date, end_date):
+    weeks = []
+    tally_week = start_date
+    while tally_week <= pd.to_datetime(end_date):
+        weeks.append(tally_week)
+        tally_week = tally_week + timedelta(days=7)
+    weeks = pd.DataFrame(weeks, columns=["Week Date"])
+    weeks["Week"] = weeks["Week Date"].apply(lambda x: x.isocalendar().week)
+    weeks = weeks[["Week", "Week Date"]]
+    return weeks
+
+
+def combine_indiviual_dfs(lauren, tara, weeks):
+    combined = weeks.merge(lauren, on=["Week", "Week Date"], how="left")
+    combined = combined.merge(tara, on=["Week", "Week Date"], how="left", suffixes=["_l", "_t"]).rename(columns={"Minutes_l": "Minutes (Lauren)", "Minutes_t": "Minutes (Tara)", "Workouts_l": "Workouts (Lauren)", "Workouts_t": "Workouts (Tara)", "Distance_l": "Distance (Lauren)", "Distance_t": "Distance (Tara)", "Points_l": "Points (Lauren)", "Points_t": "Points (Tara)"})
+    
+    nullable = [col for col in combined.columns.tolist() if "(" in col]
+    for col in nullable:
+        combined[col] = combined[col].fillna(0)
+    combined["Winner"] = combined.apply(lambda row: "None :(" if (row["Minutes (Lauren)"] < 90 and row["Minutes (Tara)"] < 90) or (row["Workouts (Lauren)"] < 3 and row["Workouts (Tara)"] < 3) else ("Lauren" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) > (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else ("Tara" if (row["Minutes (Lauren)"] * row["Workouts (Lauren)"]) < (row["Minutes (Tara)"] * row["Workouts (Tara)"]) else "Tie")), axis=1)
+    combined = combined.sort_values(by="Week Date").reset_index(drop=True)
+    return combined
+
+
 def weekly_minutes_workouts_points(named_df, week):
     # Minutes
     try:
